@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">QuanLyChiTieu</string>
+    <string-array name="category">
+        <item> Mua sắm vật dụng</item>
+        <item> Mua thực phẩm </item>
+        <item> Đổ xăng </item>
+        <item> Tiền trọ </item>
+        <item> Tiền điện </item>
+        <item> Tiền nước </item>
+        <item> Khác </item>
+    </string-array>
+</resources>
