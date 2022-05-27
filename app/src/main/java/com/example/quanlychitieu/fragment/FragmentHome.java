@@ -2,6 +2,7 @@ package com.example.quanlychitieu.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,15 +50,32 @@ public class FragmentHome extends Fragment implements RecycleViewAdapter.ItemLis
         adapter = new RecycleViewAdapter();
         db = new SQLiteHelper(getContext());
 
-        Date d = new Date();
-        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-        List<Item> list = db.getByDate(f.format(d));
-        adapter.setList(list);
-        tvTong.setText("Tổng tiền: "+tong(list));
+//        Date d = new Date();
+//        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
+//        List<Item> list = db.getByDate(f.format(d));
+//        adapter.setList(list);
+//        tvTong.setText("Tổng tiền: "+tong(list));
         LinearLayoutManager manager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
         adapter.setItemListener(this);
+
+    }
+
+    public void CallApiToday() {
+        apiInterface = ApiClient.getClient().create(APIInterface.class);
+        apiInterface.getTodayItem().enqueue(new Callback<List<Item>>() {
+            @Override
+            public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
+                List<Item> listData = response.body();
+                adapter.setList(listData);
+            }
+
+            @Override
+            public void onFailure(Call<List<Item>> call, Throwable t) {
+
+            }
+        });
     }
 
     private int tong(List<Item> list) {
@@ -71,18 +89,6 @@ public class FragmentHome extends Fragment implements RecycleViewAdapter.ItemLis
     @Override
     public void onItemClick(View view, int position) {
         Item item = adapter.getItem(position);
-        apiInterface = ApiClient.getClient().create(APIInterface.class);
-        apiInterface.getTodayItem().enqueue(new Callback<List<Item>>() {
-            @Override
-            public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
-                List<Item> listData = response.body();
-                adapter.setList(listData);
-            }
-            @Override
-            public void onFailure(Call<List<Item>> call, Throwable t) {
-
-            }
-        });
         Intent intent = new Intent(getActivity(), UpdateDeleteActivity.class);
         intent.putExtra("item",item);
         startActivity(intent);
@@ -93,8 +99,10 @@ public class FragmentHome extends Fragment implements RecycleViewAdapter.ItemLis
         super.onResume();
         Date d = new Date();
         SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-        List<Item> list = db.getByDate(f.format(d));
-        adapter.setList(list);
-        tvTong.setText("Tổng tiền: "+tong(list));
+//        List<Item> list = db.getByDate(f.format(d));
+//        adapter.setList(list);
+//        tvTong.setText("Tổng tiền: "+tong(list));
+        Log.d("PTIT", "onResume: "+f.format(d));
+        CallApiToday();
     }
 }

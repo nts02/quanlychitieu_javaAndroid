@@ -31,15 +31,16 @@ public interface APIInterface {
 
     @GET(path +"/list/{id}")
     Call<Item> getItemById(@Path("id") int id);
-//
-//    @POST(path + "/save")
-//    Call<Food> saveFood(@Body Food food);
-//
-//    @POST(path + "/edit")
-//    Call<Food> editFood(@Body Food food);
-//
-//    @GET(path + "/delete/{id}")
-//    Call<Void> deleteFood(@Path("id") long id);
+
+    @POST(path + "/store")
+    Call<Item> createItem(@Body Item item);
+
+    @POST(path + "/update")
+    Call<Item> updateItem(@Body Item item);
+
+    @GET(path + "/delete/{id}")
+    Call<Void> deleteItem(@Path("id") int id);
+
 //
 //    @GET(path + "/search/{key}")
 //    Call<List<Food>> searchFood(@Path("key") String keyword);

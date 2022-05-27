@@ -2,32 +2,40 @@ package com.example.quanlychitieu;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlychitieu.dal.SQLiteHelper;
 import com.example.quanlychitieu.model.Item;
+import com.example.quanlychitieu.network.APIInterface;
+import com.example.quanlychitieu.network.ApiClient;
 
 import java.util.Calendar;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddActivity extends AppCompatActivity implements View.OnClickListener{
 
     public Spinner sp;
     private EditText eTitle,ePrice,eDate;
     private Button btUpdate,btCancel;
-
+    private APIInterface apiInterface;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
-
+        apiInterface = ApiClient.getClient().create(APIInterface.class);
         initView();
 
         btCancel.setOnClickListener(this);
@@ -77,17 +85,35 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
             finish();
         }
         if(view == btUpdate) {
-            String  t = eTitle.getText().toString();
-            String  p = ePrice.getText().toString();
-            String  c = sp.getSelectedItem().toString();
-            String d = eDate.getText().toString();
+            Log.d("PTIT", "onClick: AAAAAA");
+            Item item = new Item();
+//            String  t = eTitle.getText().toString();
+//            String  p = ePrice.getText().toString();
+//            String  c = sp.getSelectedItem().toString();
+//            String d = eDate.getText().toString();
+            item.setTitle(eTitle.getText().toString());
+            item.setPrice(ePrice.getText().toString());
+            item.setCategory(sp.getSelectedItem().toString());
+            item.setDate(eDate.getText().toString());
 
-            if(!t.isEmpty() && p.matches("\\d+")){
-                Item i = new Item(t, c, p, d);
-                SQLiteHelper db = new SQLiteHelper(this);
-                db.addItem(i);
-                finish();
-            }
+            apiInterface.createItem(item).enqueue(new Callback<Item>() {
+                @Override
+                public void onResponse(Call<Item> call, Response<Item> response) {
+                    finish();
+                }
+
+                @Override
+                public void onFailure(Call<Item> call, Throwable t) {
+
+                }
+            });
+
+//            if(!t.isEmpty() && p.matches("\\d+")){
+//                Item i = new Item(t, c, p, d);
+//                SQLiteHelper db = new SQLiteHelper(this);
+//                db.addItem(i);
+//                finish();
+//            }
         }
     }
 }
