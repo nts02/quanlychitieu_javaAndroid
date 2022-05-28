@@ -86,7 +86,17 @@ public class FragmentHistory extends Fragment implements RecycleViewAdapter.Item
     @Override
     public void onResume() {
         super.onResume();
-//        List<Item> list = db.getAll();
-//        adapter.setList(list);
+        apiInterface.getAllItem().enqueue(new Callback<List<Item>>() {
+            @Override
+            public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
+                List<Item> listData = response.body();
+                adapter.setList(listData);
+            }
+
+            @Override
+            public void onFailure(Call<List<Item>> call, Throwable t) {
+
+            }
+        });
     }
 }

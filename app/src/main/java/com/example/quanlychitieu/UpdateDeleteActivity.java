@@ -18,22 +18,33 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlychitieu.dal.SQLiteHelper;
 import com.example.quanlychitieu.model.Item;
+import com.example.quanlychitieu.network.APIInterface;
+import com.example.quanlychitieu.network.ApiClient;
 
 import java.util.Calendar;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UpdateDeleteActivity extends AppCompatActivity implements View.OnClickListener{
     public Spinner sp;
     private EditText eTitle,ePrice,eDate;
     private Button btUpdate,btBack,btRemove;
     private Item item ;
+    private APIInterface apiInterface;
+    private int idSaved = 0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_delete);
+
+        apiInterface = ApiClient.getClient().create(APIInterface.class);
         initView();
 
         Intent intent = getIntent();
         item = (Item) intent.getSerializableExtra("item");
+        idSaved = item.getId();
         eTitle.setText(item.getTitle());
         ePrice.setText(item.getPrice());
         eDate.setText(item.getDate());
@@ -95,22 +106,28 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
             finish();
         }
         if(view == btUpdate) {
-            String  t = eTitle.getText().toString();
-            String  p = ePrice.getText().toString();
-            String  c = sp.getSelectedItem().toString();
-            String d = eDate.getText().toString();
+            Item item = new Item();
+            item.setId(idSaved);
+            item.setTitle(eTitle.getText().toString());
+            item.setPrice(ePrice.getText().toString());
+            item.setCategory(sp.getSelectedItem().toString());
+            item.setDate(eDate.getText().toString());
 
-            if(!t.isEmpty() && p.matches("\\d+")){
-                int id = item.getId();
-                Item i = new Item(id,t, c, p, d);
-                db = new SQLiteHelper(this);
-                db.update(i);
-                finish();
-            }
+            apiInterface.updateItem(item).enqueue(new Callback<Item>() {
+                @Override
+                public void onResponse(Call<Item> call, Response<Item> response) {
+                    finish();
+                }
+
+                @Override
+                public void onFailure(Call<Item> call, Throwable t) {
+
+                }
+            });
+
         }
         if(view == btRemove) {
-            int id = item.getId();
-            Context context;
+            int id = idSaved;
             AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
             builder.setTitle("Thông báo");
             builder.setMessage("Bạn có chắc muốn xoá "+item.getTitle() +"không ?");
@@ -118,9 +135,19 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
             builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    SQLiteHelper bb = new SQLiteHelper(getApplicationContext());
-                    bb.delete(id);
-                    finish();
+//                    SQLiteHelper bb = new SQLiteHelper(getApplicationContext());
+//                    bb.delete(id);
+                    apiInterface.deleteItem(id).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+
+                        }
+                    });
                 }
             });
             builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {

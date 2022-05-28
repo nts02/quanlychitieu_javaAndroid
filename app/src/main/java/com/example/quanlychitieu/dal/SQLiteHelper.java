@@ -111,4 +111,65 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         return db.delete("items", whereClause, whereAgrg);
     }
+
+    public List<Item> searchByTitle(String key) {
+        List<Item> list = new ArrayList<>();
+        //select * from items where title like %key%
+        String whereClause = "title like ?";
+        String[] whereAgrg = {"%" + key + "%"};
+        SQLiteDatabase st = getReadableDatabase();
+        Cursor rs = st.query("items", null,
+                whereClause, whereAgrg, null, null, null);
+
+        while (rs != null && rs.moveToNext()) {
+            int id = rs.getInt(0);
+            String title = rs.getString(1);
+            String category = rs.getString(2);
+            String price = rs.getString(3);
+            String date = rs.getString(4);
+            list.add(new Item(id, title, category, price, date));
+        }
+        return list;
+    }
+
+    public List<Item> searchByCategory(String category) {
+        List<Item> list = new ArrayList<>();
+        //select * from items where title like %key%
+        String whereClause = "category like ?";
+        String[] whereAgrg = {category};
+        SQLiteDatabase st = getReadableDatabase();
+        Cursor rs = st.query("items", null,
+                whereClause, whereAgrg, null, null, null);
+
+        while (rs != null && rs.moveToNext()) {
+            int id = rs.getInt(0);
+            String title = rs.getString(1);
+            String c = rs.getString(2);
+            String price = rs.getString(3);
+            String date = rs.getString(4);
+            list.add(new Item(id, title, c, price, date));
+        }
+        return list;
+    }
+
+    public List<Item> searchByDateFromTo(String from, String to) {
+        List<Item> list = new ArrayList<>();
+        //select * from items where title like %key%
+        String whereClause = "date BETWEEN ? AND ?";
+        String[] whereAgrg = {from.trim(), to.trim()};
+        SQLiteDatabase st = getReadableDatabase();
+        Cursor rs = st.query("items", null,
+                whereClause, whereAgrg, null, null, null);
+
+        while (rs != null && rs.moveToNext()) {
+            int id = rs.getInt(0);
+            String title = rs.getString(1);
+            String category = rs.getString(2);
+            String price = rs.getString(3);
+            String date = rs.getString(4);
+            list.add(new Item(id, title, category, price, date));
+        }
+        return list;
+    }
+
 }

@@ -38,7 +38,7 @@ public interface APIInterface {
     @POST(path + "/update")
     Call<Item> updateItem(@Body Item item);
 
-    @GET(path + "/delete/{id}")
+    @DELETE(path + "/delete/{id}")
     Call<Void> deleteItem(@Path("id") int id);
 
 //
