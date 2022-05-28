@@ -22,7 +22,6 @@ public interface APIInterface {
 
     String path = "api";
 
-    //lấy toàn bộ item
     @GET(path +"/list")
     Call<List<Item>> getAllItem();
 
@@ -41,9 +40,9 @@ public interface APIInterface {
     @DELETE(path + "/delete/{id}")
     Call<Void> deleteItem(@Path("id") int id);
 
-//
-//    @GET(path + "/search/{key}")
-//    Call<List<Food>> searchFood(@Path("key") String keyword);
+
+    @POST(path + "/search")
+    Call<List<Item>> searchTitle(@Query("title") String key);
 
 }
 

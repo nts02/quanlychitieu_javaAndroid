@@ -2,6 +2,7 @@ package com.example.quanlychitieu.fragment;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,19 +25,22 @@ import com.example.quanlychitieu.Adapter.RecycleViewAdapter;
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.dal.SQLiteHelper;
 import com.example.quanlychitieu.model.Item;
+import com.example.quanlychitieu.network.APIInterface;
+import com.example.quanlychitieu.network.ApiClient;
 
 import java.util.Calendar;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class FragmentSearch extends Fragment implements View.OnClickListener{
     private RecyclerView recyclerView;
-    private TextView tvTong;
     private Button btnSearch;
-    private SearchView searchView;
-    private EditText eFrom, eTo;
-    private Spinner spCategory;
+    private EditText edtSearch;
     private RecycleViewAdapter adapter;
-    private SQLiteHelper db;
+    private APIInterface apiInterface;
 
     @Nullable
     @Override
@@ -45,8 +49,46 @@ public class FragmentSearch extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public void onClick(View view) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        initView(view);
+
+        adapter = new RecycleViewAdapter();
+
+        LinearLayoutManager manager = new LinearLayoutManager(getContext(),
+                RecyclerView.VERTICAL, false);
+        recyclerView.setLayoutManager(manager);
+        recyclerView.setAdapter(adapter);
+        btnSearch.setOnClickListener(this);
+
+
+    }
+
+    private void initView(View view) {
+        recyclerView = view.findViewById(R.id.recycleView);
+        btnSearch = view.findViewById(R.id.btnSearch);
+        edtSearch = view.findViewById(R.id.edt_search);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == btnSearch){
+            String textToApi = edtSearch.getText().toString().trim();
+            apiInterface = ApiClient.getClient().create(APIInterface.class);
+            apiInterface.searchTitle(textToApi).enqueue(new Callback<List<Item>>() {
+                @Override
+                public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
+                    List<Item> listData = response.body();
+                    adapter.setList(listData);
+                }
+
+                @Override
+                public void onFailure(Call<List<Item>> call, Throwable t) {
+
+                }
+            });
+        }
     }
 
 //    @Override

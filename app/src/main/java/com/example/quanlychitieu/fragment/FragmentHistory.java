@@ -30,7 +30,6 @@ import retrofit2.Response;
 public class FragmentHistory extends Fragment implements RecycleViewAdapter.ItemListener {
     private RecycleViewAdapter adapter;
     private RecyclerView recyclerView;
-    private SQLiteHelper db;
     private APIInterface apiInterface;
     @Nullable
     @Override
@@ -43,7 +42,6 @@ public class FragmentHistory extends Fragment implements RecycleViewAdapter.Item
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.recycleView);
         adapter = new RecycleViewAdapter();
-        db = new SQLiteHelper(getContext());
         apiInterface = ApiClient.getClient().create(APIInterface.class);
         apiInterface.getAllItem().enqueue(new Callback<List<Item>>() {
             @Override
